@@ -8,7 +8,9 @@ class CreateAccountForm extends AsyncForm {
    * окно в случае успеха, а также вызывает App.update()
    * и сбрасывает форму
    * */
-  onSubmit(data) {
-
+  onSubmit(data) {  
+    Account.create(data);
+    App.modals.createAccount.element.querySelector('.form').reset();
+    App.modals.createAccount.close();
   }
 }

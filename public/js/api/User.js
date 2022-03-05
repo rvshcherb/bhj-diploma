@@ -9,7 +9,8 @@ class User {
    * локальном хранилище.
    * */
   static setCurrent(user) {
-
+    localStorage.setItem('id', user.id);
+    localStorage.setItem('name', user.name);
   }
 
   /**
@@ -17,7 +18,8 @@ class User {
    * пользователе из локального хранилища.
    * */
   static unsetCurrent() {
-
+    localStorage.removeItem('id');
+    localStorage.removeItem('name');
   }
 
   /**
@@ -25,7 +27,13 @@ class User {
    * из локального хранилища
    * */
   static current() {
-
+    let currentUser;
+    if(localStorage.id && localStorage.name) {
+      currentUser = {};
+      currentUser.id = localStorage.getItem('id');
+      currentUser.name = localStorage.getItem('name');  
+    }
+    return currentUser;
   }
 
   /**
@@ -33,7 +41,21 @@ class User {
    * авторизованном пользователе.
    * */
   static fetch(callback) {
-
+     createRequest({
+      url: this.URL + '/current',
+      method: 'GET',
+      callback: (err, response) => {
+        if(response.success === true) {
+          this.setCurrent(response.user);
+          console.log('user is authorized');
+        } else {
+          this.unsetCurrent();
+          console.log(response.error);
+        }
+        
+        callback();
+      }
+     });
   }
 
   /**
@@ -64,7 +86,7 @@ class User {
    * User.setCurrent.
    * */
   static register(data, callback) {
-
+   console.log(data);
   }
 
   /**
@@ -72,6 +94,34 @@ class User {
    * выхода необходимо вызвать метод User.unsetCurrent
    * */
   static logout(callback) {
-
+    createRequest({
+      url: this.URL + '/logout',
+      method: 'POST',
+      callback: (err, response) => {
+        if (response && response.success === true) {
+          this.unsetCurrent();
+        }
+        callback(err, response);
+      }
+    });
   }
 }
+
+User.URL = '/user';
+
+//User.login(vasyaTest, (err, result) => console.log(result));
+//User.logout((err, response) => User.unsetCurrent());
+//User.unsetCurrent();
+
+// createRequest({
+//   url: '/account',
+//   method: 'GET',
+//   responseType: 'json'
+// });
+
+// createRequest({
+//   url: '/account',
+//   method: 'PUT',
+//   responseType: 'json',
+//   data: {name: 'Наличные'}
+// });
