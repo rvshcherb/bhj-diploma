@@ -31,8 +31,11 @@ class AccountsWidget {
       App.getModal('createAccount').element.setAttribute('style', 'display: block');
     });
 
-    // this.element.querySelectorAll('.account').addEventListener('click', ()=>console.log('test'));
-    console.log(this.element.querySelectorAll('.account'));
+    this.element.addEventListener('click', (evt) => {
+      if(evt.target.closest('.account')){
+        this.onSelectAccount(evt);
+      }
+    });
   }
 
   /**
@@ -46,8 +49,14 @@ class AccountsWidget {
    * метода renderItem()
    * */
   update() {
-    Account.list(24, (err,response)=> this.renderItem(response.data));
-    //console.log('update');
+    Account.list(undefined, (err,response)=> {
+      if(response && response.data) {
+        this.clear();
+        this.renderItem(response.data);
+      } else {
+        //console.log(err);
+      }
+    });
   }
 
   /**
@@ -56,9 +65,11 @@ class AccountsWidget {
    * в боковой колонке
    * */
   clear() {
-    const accounts = Array.from(App.widgets.accounts.element.children);
-    for (let i = 1; i <accounts.length; i++) {
-      accounts[i].remove();
+    if(this.element.children.length > 1) {
+      const accounts = Array.from(App.widgets.accounts.element.children);
+      for (let i = 1; i <accounts.length; i++) {
+        accounts[i].remove();
+      }
     }
   }
 
@@ -70,7 +81,12 @@ class AccountsWidget {
    * Вызывает App.showPage( 'transactions', { account_id: id_счёта });
    * */
   onSelectAccount( element ) {
-    console.log('onSelectAccount');
+    document.querySelectorAll('.account').forEach(element => {
+      element.classList.remove('active');
+    });
+    
+    element.target.closest('.account').classList.add('active');
+    App.showPage( 'transactions', { account_id: element.target.closest('.account').dataset.id});
   }
 
   /**
@@ -84,7 +100,7 @@ class AccountsWidget {
                 <span>${item.name}</span> /
                 <span>${item.sum}</span>
               </a>
-            </li>`
+            </li>`;
   }
 
   /**
@@ -97,35 +113,6 @@ class AccountsWidget {
     data.forEach(element => {
       document.querySelector(".accounts-panel").insertAdjacentHTML('beforeend', this.getAccountHTML(element));
     });
-    // const accountItem = document.createElement('li');
-    // const accountLink = document.createElement('a');
-    // const accountName = document.createElement('span');
-    // const accountBalance = document.createElement('span');
-    // accountItem.class = 'active account'
-    // accountItem.data.id = data.id;
-    // accountLink.setAttribute('href', '#');
-    // accountName.innerText = `${data.name}`;
-    // accountBalance.innerText = `${data.sum}`;
-    // accountItem.appendChild(accountLink);
-    // accountLink.appendChild(accountName);
-    // accountLink.appendChild(accountBalance);
   }
 }
 
-// Отдельная функция отрисовки счета. Удалить в конце. 
-
-// const renderItem = function(data){
-//   const accountItem = document.createElement('li');
-//   const accountLink = document.createElement('a');
-//   const accountName = document.createElement('span');
-//   const accountBalance = document.createElement('span');
-//   accountItem.class = 'active account'
-//   accountItem.dataset.id = data.id;
-//   accountLink.setAttribute('href', '#');
-//   accountName.innerText = `${data.name} `;
-//   accountBalance.innerText = `${data.sum}`;
-//   accountItem.appendChild(accountLink);
-//   accountLink.appendChild(accountName);
-//   accountLink.appendChild(accountBalance);
-//   document.querySelector(".accounts-panel").appendChild(accountItem);
-// }

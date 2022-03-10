@@ -85,7 +85,7 @@ class App {
       ),
       createExpense: new CreateTransactionForm(
         document.querySelector("#new-expense-form")
-      ),
+      )
     };
   }
 

@@ -28,10 +28,10 @@ class User {
    * */
   static current() {
     let currentUser;
-    if(localStorage.id && localStorage.name) {
+    if (localStorage.id && localStorage.name) {
       currentUser = {};
       currentUser.id = localStorage.getItem('id');
-      currentUser.name = localStorage.getItem('name');  
+      currentUser.name = localStorage.getItem('name');
     }
     return currentUser;
   }
@@ -41,21 +41,18 @@ class User {
    * авторизованном пользователе.
    * */
   static fetch(callback) {
-     createRequest({
+    createRequest({
       url: this.URL + '/current',
       method: 'GET',
       callback: (err, response) => {
-        if(response.success === true) {
+        if (response.success === true) {
           this.setCurrent(response.user);
-          console.log('user is authorized');
         } else {
           this.unsetCurrent();
-          console.log(response.error);
         }
-        
         callback();
       }
-     });
+    });
   }
 
   /**
@@ -86,7 +83,18 @@ class User {
    * User.setCurrent.
    * */
   static register(data, callback) {
-   console.log(data);
+    createRequest({
+      url: this.URL + '/register',
+      method: 'POST',
+      responseType: 'json',
+      data,
+      callback: (err, response) => {
+        if (response && response.user) {
+          this.setCurrent(response.user);
+        }
+        callback(err, response);
+      }
+    });
   }
 
   /**
@@ -108,20 +116,3 @@ class User {
 }
 
 User.URL = '/user';
-
-//User.login(vasyaTest, (err, result) => console.log(result));
-//User.logout((err, response) => User.unsetCurrent());
-//User.unsetCurrent();
-
-// createRequest({
-//   url: '/account',
-//   method: 'GET',
-//   responseType: 'json'
-// });
-
-// createRequest({
-//   url: '/account',
-//   method: 'PUT',
-//   responseType: 'json',
-//   data: {name: 'Наличные'}
-// });

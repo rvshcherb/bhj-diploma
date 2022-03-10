@@ -13,7 +13,8 @@ class Entity {
       url: this.URL,
       method: 'GET',
       responseType: 'json',
-      callback: (err, response) => callback(err, response)
+      data,
+      callback
     });
   }
 
@@ -27,7 +28,8 @@ class Entity {
       url: this.URL,
       method: 'PUT',
       responseType: 'json',
-      data
+      data,
+      callback
     });
   }
 
@@ -36,7 +38,13 @@ class Entity {
    * (в зависимости от того, что наследуется от Entity)
    * */
   static remove(data, callback) {
-
+    createRequest({
+      url: this.URL,
+      method: 'DELETE',
+      responseType: 'json',
+      data,
+      callback
+    });
   }
 }
 

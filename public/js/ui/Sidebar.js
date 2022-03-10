@@ -45,7 +45,7 @@ class Sidebar {
         } else {
           console.log(err);
         }
-      })
+      });
     });
   }
 }
