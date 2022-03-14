@@ -13,6 +13,7 @@ class TransactionsPage {
   constructor( element ) {
     this.element = element;
     this.lastOptions = undefined;
+    this.transactionId = undefined;
     this.registerEvents();
   }
 
@@ -32,29 +33,17 @@ class TransactionsPage {
    * */
   registerEvents() {
     this.element.querySelector('.remove-account').addEventListener('click', () => {
-      if(this.lastOptions) {
-        Account.remove({id: this.lastOptions.account_id}, (err, response) => {
-          if(response && response.success === true) {
-            App.updateWidgets();
-            App.updateForms();
-          }
-        });
+      if(window.confirm('Вы действительно хотите удалить счет?') && this.lastOptions) {
+        this.removeAccount();
       }
     });
+
     this.element.querySelector('.content').addEventListener('click', (evt) => {
-      if(evt.target.classList.contains('fa-trash')) {
-        Transaction.remove({id: evt.target.closest('.transaction__remove').dataset.id}, (err,response) => {
-          if(response && response.success === true) {
-            App.update();
-          }
-        });
-      } else if (evt.target.classList.contains('transaction__remove')) {
-        Transaction.remove({id: evt.target.dataset.id}, (err,response) => {
-          if(response && response.success === true) {
-            App.update();
-          }
-        });
-      } 
+        if(evt.target.classList.contains('fa-trash') && window.confirm('Вы действительно хотите удалить транзакцию?')) {
+          this.removeTransaction({id: evt.target.closest('.transaction__remove').dataset.id});  
+        } else if (evt.target.classList.contains('transaction__remove') && window.confirm('Вы действительно хотите удалить транзакцию?')) {
+          this.removeTransaction({id: evt.target.dataset.id});
+        } 
     });
   }
 
@@ -68,7 +57,14 @@ class TransactionsPage {
    * для обновления приложения
    * */
   removeAccount() {
-
+    Account.remove({id: this.lastOptions.account_id}, (err, response) => {
+      if(response && response.success === true) {
+        App.updateWidgets();
+        App.updateForms();
+      } else {
+        console.log(response);
+      }
+    });
   }
 
   /**
@@ -78,7 +74,11 @@ class TransactionsPage {
    * либо обновляйте текущую страницу (метод update) и виджет со счетами
    * */
   removeTransaction( id ) {
-
+    Transaction.remove(id, (err,response) => {
+      if(response && response.success === true) {
+        App.update();
+      }
+    });
   }
 
   /**
